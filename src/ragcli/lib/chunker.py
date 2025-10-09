@@ -26,18 +26,17 @@ class TextChunker:
         self.chunk_overlap = config.chunk_overlap
         logger.info(f"initialized chunker with size {self.chunk_size} and overlap {self.chunk_overlap}")
 
-    def chunk_file(self, file_path: str) -> List[Chunk]:
+    def chunk_file(self, file_path: Path) -> List[Chunk]:
         """Chunk a single file into text chunks."""
-        path = Path(file_path)
-        if not path.exists():
+        if not file_path.exists():
             raise FileNotFoundError(f"file not found: {file_path}")
 
         try:
-            with open(path, "r", encoding="utf-8") as f:
+            with open(file_path, "r", encoding="utf-8") as f:
                 content = f.read()
 
             logger.info(f"read file {file_path}, length: {len(content)} characters")
-            return self.chunk_text(content, str(path))
+            return self.chunk_text(content, str(file_path))
         except Exception as e:
             logger.error(f"failed to read file {file_path}: {e}")
             raise
@@ -108,7 +107,7 @@ class TextChunker:
         logger.info(f"created {len(chunks)} chunks from {len(text)} characters")
         return chunks
 
-    def chunk_files(self, file_paths: List[str]) -> List[Chunk]:
+    def chunk_files(self, file_paths: List[Path]) -> List[Chunk]:
         """Chunk multiple files."""
         all_chunks = []
         for file_path in file_paths:

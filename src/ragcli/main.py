@@ -1,5 +1,6 @@
 import typer
 import uuid
+from pathlib import Path
 from typing import List, Optional
 
 from .lib.config import Config
@@ -10,12 +11,12 @@ from .lib.agent import QueryAgent
 from .lib.log import get_logger
 
 logger = get_logger(__name__)
-app = typer.Typer(help="RAG CLI - Insert and query documents using vector search")
+app = typer.Typer(help="RAG CLI - Insert and query documents using vector search.")
 
 
 @app.command()
 def insert(
-    files: List[str] = typer.Argument(..., help="List of files to ingest"),
+    files: List[Path] = typer.Argument(..., help="List of files to ingest"),
     collection: str = typer.Option("documents", "--collection", "-c", help="Collection name"),
     chunk_size: Optional[int] = typer.Option(None, "--chunk-size", help="Chunk size in characters"),
     chunk_overlap: Optional[int] = typer.Option(None, "--chunk-overlap", help="Chunk overlap in characters"),
