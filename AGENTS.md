@@ -60,9 +60,3 @@ uv add <your-package-name>
 ```
 
 This installs the package and adds it to `pyproject.toml`.
-
-## Running The Application
-
-```
-make run
-```
