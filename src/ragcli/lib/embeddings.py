@@ -29,6 +29,8 @@ class EmbeddingService:
             )
             embedding = response.data[0].embedding
             logger.debug(f"generated embedding for text length {len(text)}, size {len(embedding)}")
+            logger.debug(f"vector preview: {embedding[:5]}...{embedding[-5:]}")
+            logger.debug(f"vector stats: min={min(embedding):.6f}, max={max(embedding):.6f}, mean={sum(embedding)/len(embedding):.6f}")
             return embedding
         except Exception as e:
             logger.error(f"failed to generate embedding: {e}")
