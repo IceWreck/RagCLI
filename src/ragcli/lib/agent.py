@@ -47,11 +47,41 @@ class QueryAgent:
             model,
             output_type=SearchTerms,
             system_prompt=textwrap.dedent("""\
-                You are an expert at converting natural language questions into effective search terms.
-                Analyze the user's question and extract 3-5 relevant search terms.
+                You are an expert information retrieval specialist who converts natural language questions into high-quality search terms for vector database similarity search.
 
-                Focus on semantic meaning rather than exact wording.
-                Example terms: "machine learning algorithms", "neural networks", "deep learning models", "AI training"
+                CRITICAL: Your search terms will be embedded as vectors and used to find semantically similar documents. The quality of these terms directly determines retrieval quality.
+
+                QUALITY PRINCIPLES:
+                1. **Semantic Diversity**: Each term should explore a different semantic angle of the question
+                2. **Document-Centric**: Use language that would actually appear in relevant documents
+                3. **Specificity Balance**: Not too broad (noisy) or too narrow (misses relevant docs)
+                4. **Contextual Richness**: Include relevant context and domain-specific terminology
+                5. **Natural Phrasing**: Use complete, natural language phrases, not keywords
+
+                SEARCH TERM STRATEGY:
+                • **Core Concept**: Primary subject/topic of the question
+                • **Process/Method**: How something works or is done
+                • **Technical Terms**: Domain-specific jargon and terminology
+                • **Related Concepts**: Associated ideas, examples, or applications
+                • **Alternative Phrasings**: Different ways the same concept might be expressed
+
+                AVOID:
+                - Generic or overly broad terms
+                - Exact question restatement
+                - Single words (prefer phrases)
+                - Terms too specific to one document
+                - Stop words or filler phrases
+
+                Example analysis:
+                Question: "How do neural networks learn?"
+                High-quality terms:
+                1. "neural network learning process and mechanisms" (Core Concept)
+                2. "backpropagation algorithm and gradient computation" (Process/Method)
+                3. "artificial neural network training optimization" (Technical Terms)
+                4. "machine learning model parameter updates" (Related Concepts)
+                5. "deep neural network weight adjustment" (Alternative Phrasing)
+
+                Generate 5 search terms that maximize semantic coverage for effective vector retrieval.
             """),
         )
 
@@ -67,7 +97,7 @@ class QueryAgent:
             search_terms = result.output.terms
 
             logger.info(f"generated {len(search_terms)} search terms")
-            logger.debug(f"search terms: {search_terms}")
+            logger.info(f"search terms: {search_terms}")
             return search_terms
         except Exception as e:
             logger.error(f"failed to generate search terms: {e}")
@@ -103,7 +133,7 @@ class QueryAgent:
                     relevant_docs.append(doc)
 
             # Limit to requested number of documents
-            relevant_docs = relevant_docs[:limit]
+            # relevant_docs = relevant_docs[:limit]
 
             if not relevant_docs:
                 logger.warning("no relevant documents found")
