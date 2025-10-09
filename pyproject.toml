@@ -8,12 +8,15 @@ authors = [
 ]
 requires-python = ">=3.12"
 dependencies = [
-    "pydantic-ai>=1.0.17",
+    "httpx>=0.28.1",
+    "openai>=2.2.0",
+    "pydantic-ai-slim[openai]>=1.0.17",
+    "qdrant-client>=1.15.1",
     "typer>=0.19.2",
 ]
 
 [project.scripts]
-ragexperiments = "ragcli:main"
+ragexperiments = "ragcli.main:main"
 
 [build-system]
 requires = ["hatchling"]
@@ -25,3 +28,8 @@ indent-width = 4
 
 [tool.pyright]
 typeCheckingMode = "standard"
+
+[dependency-groups]
+dev = [
+    "mypy>=1.18.2",
+]

@@ -21,3 +21,13 @@ lint:
 
 mypy:
 	uv run mypy ./src
+
+qdrant-start:
+	podman run -d --name qdrant -p 6333:6333 -p 6334:6334 qdrant/qdrant:latest
+
+qdrant-stop:
+	podman stop qdrant
+	podman rm qdrant
+
+qdrant-logs:
+	podman logs -f qdrant
