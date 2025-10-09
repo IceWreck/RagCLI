@@ -100,7 +100,7 @@ def query(
             raise typer.Exit(1)
 
         # Process query
-        response = agent.query_sync(question, limit)
+        response = agent.query(question, limit)
 
         typer.echo(f"\n🤖 Answer:\n{response}")
 

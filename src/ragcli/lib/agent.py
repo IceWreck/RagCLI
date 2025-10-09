@@ -1,5 +1,6 @@
 import textwrap
 from typing import List
+from pydantic import BaseModel
 from pydantic_ai import Agent
 from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.openai import OpenAIProvider
@@ -10,6 +11,11 @@ from .embeddings import EmbeddingService
 from .log import get_logger
 
 logger = get_logger(__name__)
+
+
+class SearchTerms(BaseModel):
+    """Search terms generated from natural language queries."""
+    terms: List[str]
 
 
 class QueryAgent:
@@ -36,19 +42,68 @@ class QueryAgent:
             """),
         )
 
+        # Setup search term generation agent with structured output
+        self.search_agent = Agent(
+            model,
+            output_type=SearchTerms,
+            system_prompt=textwrap.dedent("""\
+                You are an expert at converting natural language questions into effective search terms.
+                Analyze the user's question and extract 3-5 relevant search terms.
+
+                Focus on semantic meaning rather than exact wording.
+                Example terms: "machine learning algorithms", "neural networks", "deep learning models", "AI training"
+            """),
+        )
+
         self.embedding_service = EmbeddingService(config)
         logger.info(f"initialized query agent with model {config.llm_model}")
 
-    async def query(self, question: str, limit: int = 5) -> str:
+    def _generate_search_terms(self, question: str) -> List[str]:
+        """Generate search terms from natural language question."""
+        try:
+            logger.info(f"generating search terms for question: {question[:100]}...")
+
+            result = self.search_agent.run_sync(question)
+            search_terms = result.output.terms
+
+            logger.info(f"generated {len(search_terms)} search terms")
+            logger.debug(f"search terms: {search_terms}")
+            return search_terms
+        except Exception as e:
+            logger.error(f"failed to generate search terms: {e}")
+            # Fallback to using the question as single search term
+            return [question]
+
+    def query(self, question: str, limit: int = 5) -> str:
         """Answer a question using RAG."""
         try:
-            # Generate embedding for the question
-            logger.info(f"generating embedding for question: {question[:100]}...")
-            query_embedding = self.embedding_service.embed_text(question)
+            # Generate search terms from the natural language question
+            search_terms = self._generate_search_terms(question)
+            logger.info(f"searching with {len(search_terms)} queries")
 
-            # Search for relevant documents
-            logger.info(f"searching for {limit} relevant documents")
-            relevant_docs = self.vector_store.search(query_embedding, limit=limit)
+            # Generate embeddings for all search queries
+            all_embeddings = []
+            for query in search_terms:
+                embedding = self.embedding_service.embed_text(query)
+                all_embeddings.append(embedding)
+                logger.debug(f"generated embedding for search query: {query[:50]}...")
+
+            # Search for relevant documents using all embeddings
+            all_docs = []
+            for embedding in all_embeddings:
+                docs = self.vector_store.search(embedding, limit=limit)
+                all_docs.extend(docs)
+
+            # Remove duplicates while preserving order
+            seen_texts = set()
+            relevant_docs = []
+            for doc in all_docs:
+                if doc.text not in seen_texts:
+                    seen_texts.add(doc.text)
+                    relevant_docs.append(doc)
+
+            # Limit to requested number of documents
+            relevant_docs = relevant_docs[:limit]
 
             if not relevant_docs:
                 logger.warning("no relevant documents found")
@@ -73,8 +128,8 @@ class QueryAgent:
                 Answer:""")
 
             logger.info("generating response with pydantic ai")
-            result = await self.agent.run(prompt)
-            response = str(result)
+            result = self.agent.run_sync(prompt)
+            response = result.output
 
             logger.info("successfully generated response")
             return response
@@ -92,9 +147,3 @@ class QueryAgent:
                 f"Document {i}:\nSource: {doc.metadata.get('source', 'unknown')}\n{metadata_str}\nContent: {doc.text}\n"
             )
         return "\n".join(context_parts)
-
-    def query_sync(self, question: str, limit: int = 5) -> str:
-        """Synchronous version of query method."""
-        import asyncio
-
-        return asyncio.run(self.query(question, limit))
