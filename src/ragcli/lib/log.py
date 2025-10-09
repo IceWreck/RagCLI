@@ -15,4 +15,10 @@ def get_logger(name: str) -> logging.Logger:
         level=getattr(logging, os.getenv("LOG_LEVEL", "INFO").upper()),
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
+
+    # Disable httpx logs
+    logging.getLogger("httpx").setLevel(logging.WARNING)
+    logging.getLogger("httpx._client").setLevel(logging.WARNING)
+    logging.getLogger("httpx._transports.default").setLevel(logging.WARNING)
+
     return logging.getLogger(name)
