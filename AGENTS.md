@@ -1,6 +1,59 @@
-# Agents Knowledge
+# RAG CLI System
 
-Retrieval-augmented generation CLI. Tool to insert knowledge into a vector db and then ask questions about it.
+A modular CLI-based Retrieval-Augmented Generation (RAG) system for ingesting documents and querying them using vector search and LLMs.
+
+## Overview
+
+The RAG CLI system enables users to:
+
+- **Ingest documents** (plaintext, markdown) into a vector database
+- **Chunk documents** intelligently with configurable overlap
+- **Generate embeddings** using OpenAI-compatible models
+- **Store and search** vectors using Qdrant
+- **Query documents** using LLM-powered question answering
+
+The system is designed as a modular library with clean separation of concerns, making it easy to extend and customize components.
+
+## Architecture
+
+### Core Components
+
+```
+src/ragcli/
+├── main.py              # CLI interface using Typer
+├── lib/
+│   ├── config.py        # Configuration management with environment variables
+│   ├── store.py         # Vector store abstraction and Qdrant implementation
+│   ├── chunker.py       # Text chunking with overlap handling
+│   ├── embeddings.py    # OpenAI embedding service
+│   ├── agent.py         # Pydantic AI query agent
+│   └── log.py           # Logging utilities
+```
+
+### Data Flow
+
+**Ingestion Pipeline:**
+
+1. **File Reading** → Read plaintext/markdown files
+2. **Text Chunking** → Split documents into overlapping chunks
+3. **Embedding Generation** → Convert chunks to vector embeddings
+4. **Vector Storage** → Store in Qdrant with metadata
+
+**Query Pipeline:**
+
+1. **Question Embedding** → Convert query to vector
+2. **Vector Search** → Find similar document chunks
+3. **Context Building** → Assemble relevant chunks as context
+4. **LLM Generation** → Generate answer using Pydantic AI
+
+### Technology Stack
+
+- **CLI Framework**: Typer for command-line interface
+- **Vector Database**: Qdrant for similarity search
+- **LLM Integration**: Pydantic AI with OpenAI-compatible endpoints
+- **Embeddings**: OpenAI library with configurable models
+- **Containerization**: Podman for Qdrant deployment (read Makefile)
+- **Dependency Management**: UV for Python packages
 
 ## Code Conventions
 
