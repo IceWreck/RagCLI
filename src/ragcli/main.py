@@ -3,7 +3,7 @@ import uuid
 from pathlib import Path
 from typing import List, Optional
 
-from .lib.config import Config
+from .lib.config import Config, DEFAULT_VECTOR_COLLECTION
 from .lib.store import QdrantStore, Document
 from .lib.chunker import TextChunker
 from .lib.embeddings import EmbeddingService
@@ -17,7 +17,7 @@ app = typer.Typer(help="RAG CLI - Insert and query documents using vector search
 @app.command()
 def insert(
     files: List[Path] = typer.Argument(..., help="List of files to ingest"),
-    collection: str = typer.Option("documents", "--collection", "-c", help="Collection name"),
+    collection: str = typer.Option(DEFAULT_VECTOR_COLLECTION, "--collection", "-c", help="Collection name"),
     chunk_size: Optional[int] = typer.Option(None, "--chunk-size", help="Chunk size in characters"),
     chunk_overlap: Optional[int] = typer.Option(None, "--chunk-overlap", help="Chunk overlap in characters"),
 ) -> None:
@@ -80,7 +80,7 @@ def insert(
 @app.command()
 def query(
     question: str = typer.Argument(..., help="Question to ask"),
-    collection: str = typer.Option("documents", "--collection", "-c", help="Collection name"),
+    collection: str = typer.Option(DEFAULT_VECTOR_COLLECTION, "--collection", "-c", help="Collection name"),
     limit: int = typer.Option(5, "--limit", "-l", help="Number of documents to retrieve"),
 ) -> None:
     """Ask a question using RAG."""
@@ -111,7 +111,9 @@ def query(
 
 
 @app.command()
-def status(collection: str = typer.Option("documents", "--collection", "-c", help="Collection name")) -> None:
+def status(
+    collection: str = typer.Option(DEFAULT_VECTOR_COLLECTION, "--collection", "-c", help="Collection name"),
+) -> None:
     """Check system status."""
     try:
         config = Config.from_env()
@@ -136,7 +138,7 @@ def status(collection: str = typer.Option("documents", "--collection", "-c", hel
 
 @app.command()
 def delete_collection(
-    collection: str = typer.Option("documents", "--collection", "-c", help="Collection name"),
+    collection: str = typer.Option(DEFAULT_VECTOR_COLLECTION, "--collection", "-c", help="Collection name"),
     confirm: bool = typer.Option(False, "--confirm", help="Confirm deletion"),
 ) -> None:
     """Delete a collection."""

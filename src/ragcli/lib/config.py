@@ -2,6 +2,8 @@ import os
 from dataclasses import dataclass
 from typing import Optional
 
+DEFAULT_VECTOR_COLLECTION = "ragcli-default-collection"
+
 
 @dataclass
 class Config:
@@ -15,6 +17,7 @@ class Config:
     qdrant_port: int = 6333
     chunk_size: int = 1000
     chunk_overlap: int = 200
+    vector_collection: str = DEFAULT_VECTOR_COLLECTION
 
     @classmethod
     def from_env(cls) -> "Config":
@@ -28,4 +31,5 @@ class Config:
             qdrant_port=int(os.getenv("QDRANT_PORT", str(cls.qdrant_port))),
             chunk_size=int(os.getenv("CHUNK_SIZE", str(cls.chunk_size))),
             chunk_overlap=int(os.getenv("CHUNK_OVERLAP", str(cls.chunk_overlap))),
+            vector_collection=os.getenv("VECTOR_COLLECTION", cls.vector_collection),
         )

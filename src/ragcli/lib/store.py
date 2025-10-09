@@ -47,7 +47,7 @@ class VectorStore(ABC):
 class QdrantStore(VectorStore):
     """Qdrant implementation of VectorStore."""
 
-    def __init__(self, config: Config, collection_name: str = "documents"):
+    def __init__(self, config: Config, collection_name: str):
         self.config = config
         self.collection_name = collection_name
         self.client = QdrantClient(
