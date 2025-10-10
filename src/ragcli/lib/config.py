@@ -2,6 +2,8 @@ import os
 from dataclasses import dataclass
 from typing import Optional
 
+from dotenv import load_dotenv
+
 DEFAULT_VECTOR_COLLECTION = "ragcli-default-collection"
 
 
@@ -22,6 +24,9 @@ class Config:
     @classmethod
     def from_env(cls) -> "Config":
         """Create Config instance from environment variables."""
+        # Load .env file from current directory or parent directories
+        load_dotenv()
+
         return cls(
             openai_base_url=os.getenv("OPENAI_BASE_URL", cls.openai_base_url),
             openai_api_key=os.getenv("OPENAI_API_KEY"),

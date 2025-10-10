@@ -15,6 +15,7 @@ logger = get_logger(__name__)
 
 class SearchTerms(BaseModel):
     """Search terms generated from natural language queries."""
+
     terms: List[str]
 
 
