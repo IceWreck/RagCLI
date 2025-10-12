@@ -119,17 +119,17 @@ class QueryAgent:
                 logger.debug(f"generated embedding for search query: {query[:50]}...")
 
             # Search for relevant documents using all embeddings
-            all_docs = []
+            all_docs: list[Document] = []
             for embedding in all_embeddings:
                 docs = self.vector_store.search(embedding, limit=limit)
                 all_docs.extend(docs)
 
             # Remove duplicates while preserving order
-            seen_texts = set()
+            seen_ids: set[str] = set()
             relevant_docs = []
             for doc in all_docs:
-                if doc.text not in seen_texts:
-                    seen_texts.add(doc.text)
+                if doc.id and doc.id not in seen_ids:
+                    seen_ids.add(doc.id)
                     relevant_docs.append(doc)
 
             # Limit to requested number of documents
