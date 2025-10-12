@@ -13,11 +13,11 @@ develop:
 	touch .env
 
 format:
-	uv tool run ruff format ./src
+	uv run ruff format ./src
 
 lint:
-	uv tool run ruff check --fix src/
-	uv tool run ruff check
+	uv run ruff check --fix src/
+	uv run ruff check
 
 mypy:
 	uv run mypy ./src
