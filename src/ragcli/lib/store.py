@@ -24,8 +24,8 @@ class VectorStore(ABC):
     """Abstract base class for vector stores."""
 
     @abstractmethod
-    def add_documents(self, documents: list[Document]) -> list[str]:
-        """Add documents to the vector store."""
+    def upsert_with_vectors(self, documents: list[Document], vectors: list[list[float]]) -> list[str]:
+        """Add documents with their vectors to the vector store."""
         pass
 
     @abstractmethod
@@ -77,46 +77,26 @@ class QdrantStore(VectorStore):
             logger.error(f"failed to check collection existence: {e}")
             return False
 
-    def add_documents(self, documents: list[Document]) -> list[str]:
-        """Add documents to Qdrant."""
-        if not documents:
-            return []
-
-        # Create collection if it doesn't exist
-        if not self.collection_exists(self.collection_name):
-            # Assume embedding size from first document (will be set before calling this)
-            logger.info(f"collection {self.collection_name} does not exist, creating it")
-            # This will be called after embedding, so we know the vector size
-            pass
-
-        points = []
-        for i, doc in enumerate(documents):
-            point_id = doc.id or str(i)
-            points.append(
-                PointStruct(
-                    id=point_id,
-                    vector=[],  # Will be filled by embedder
-                    payload={"text": doc.text, **doc.metadata},
-                )
-            )
-
-        try:
-            # Note: This expects vectors to be set in the points before calling
-            logger.info(f"adding {len(documents)} documents to collection {self.collection_name}")
-            # This method needs to be called with pre-embedded vectors
-            # The actual upsert will be handled in a higher-level method
-            return [str(point.id) for point in points]
-        except Exception as e:
-            logger.error(f"failed to add documents: {e}")
-            raise
-
     def upsert_with_vectors(self, documents: list[Document], vectors: list[list[float]]) -> list[str]:
         """Upsert documents with their vectors to Qdrant."""
         if len(documents) != len(vectors):
             raise ValueError("number of documents and vectors must match")
 
+        if not documents:
+            logger.warning("no documents provided for upsert")
+            return []
+
+        # Validate vectors
+        if not vectors or any(not v for v in vectors):
+            raise ValueError("vectors cannot be empty")
+
+        # Check all vectors have the same dimension
+        vector_size = len(vectors[0])
+        if any(len(v) != vector_size for v in vectors):
+            raise ValueError("all vectors must have the same dimension")
+
         if not self.collection_exists(self.collection_name):
-            self.create_collection(self.collection_name, len(vectors[0]))
+            self.create_collection(self.collection_name, vector_size)
 
         points = []
         for i, (doc, vector) in enumerate(zip(documents, vectors)):
