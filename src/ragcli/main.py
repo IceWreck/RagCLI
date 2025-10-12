@@ -1,7 +1,6 @@
 import typer
 import uuid
 from pathlib import Path
-from typing import List, Optional
 
 from .lib.config import Config, DEFAULT_VECTOR_COLLECTION
 from .lib.store import QdrantStore, Document
@@ -16,10 +15,10 @@ app = typer.Typer(help="RAG CLI - Insert and query documents using vector search
 
 @app.command()
 def insert(
-    files: List[Path] = typer.Argument(..., help="List of files to ingest"),
+    files: list[Path] = typer.Argument(..., help="List of files to ingest"),
     collection: str = typer.Option(DEFAULT_VECTOR_COLLECTION, "--collection", "-c", help="Collection name"),
-    chunk_size: Optional[int] = typer.Option(None, "--chunk-size", help="Chunk size in characters"),
-    chunk_overlap: Optional[int] = typer.Option(None, "--chunk-overlap", help="Chunk overlap in characters"),
+    chunk_size: int | None = typer.Option(None, "--chunk-size", help="Chunk size in characters"),
+    chunk_overlap: int | None = typer.Option(None, "--chunk-overlap", help="Chunk overlap in characters"),
 ) -> None:
     """Insert documents into the vector store."""
     try:
@@ -50,8 +49,8 @@ def insert(
         embedded_chunks = embedder.embed_chunks(chunks)
 
         # Convert to Document objects
-        documents: List[Document] = []
-        vectors: List[List[float]] = []
+        documents: list[Document] = []
+        vectors: list[list[float]] = []
         for chunk, embedding in embedded_chunks:
             doc = Document(
                 text=chunk.text,

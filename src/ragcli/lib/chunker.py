@@ -1,4 +1,4 @@
-from typing import List, Dict, Any
+from typing import Any
 from pathlib import Path
 from dataclasses import dataclass
 
@@ -13,7 +13,7 @@ class Chunk:
     """Text chunk data structure."""
 
     text: str
-    metadata: Dict[str, Any]
+    metadata: dict[str, Any]
     source: str
     chunk_index: int
 
@@ -26,7 +26,7 @@ class TextChunker:
         self.chunk_overlap = config.chunk_overlap
         logger.info(f"initialized chunker with size {self.chunk_size} and overlap {self.chunk_overlap}")
 
-    def chunk_file(self, file_path: Path) -> List[Chunk]:
+    def chunk_file(self, file_path: Path) -> list[Chunk]:
         """Chunk a single file into text chunks."""
         if not file_path.exists():
             raise FileNotFoundError(f"file not found: {file_path}")
@@ -41,7 +41,7 @@ class TextChunker:
             logger.error(f"failed to read file {file_path}: {e}")
             raise
 
-    def chunk_text(self, text: str, source: str) -> List[Chunk]:
+    def chunk_text(self, text: str, source: str) -> list[Chunk]:
         """Split text into chunks with overlap."""
         if not text.strip():
             logger.warning("empty text provided for chunking")
@@ -107,7 +107,7 @@ class TextChunker:
         logger.info(f"created {len(chunks)} chunks from {len(text)} characters")
         return chunks
 
-    def chunk_files(self, file_paths: List[Path]) -> List[Chunk]:
+    def chunk_files(self, file_paths: list[Path]) -> list[Chunk]:
         """Chunk multiple files."""
         all_chunks = []
         for file_path in file_paths:

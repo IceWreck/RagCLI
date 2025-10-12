@@ -1,6 +1,5 @@
 import os
 from dataclasses import dataclass
-from typing import Optional
 
 from dotenv import load_dotenv
 
@@ -12,7 +11,7 @@ class Config:
     """Configuration class for RAG CLI system."""
 
     openai_base_url: str = "http://calyrex-neb.abifog.com:7884/v1/"
-    openai_api_key: Optional[str] = None
+    openai_api_key: str | None = None
     llm_model: str = "gpt-oss-20b"
     embedding_model: str = "nomic-embed-text"
     qdrant_host: str = "127.0.0.1"

@@ -1,5 +1,4 @@
 import textwrap
-from typing import List
 from pydantic import BaseModel
 from pydantic_ai import Agent
 from pydantic_ai.models.openai import OpenAIChatModel
@@ -16,7 +15,7 @@ logger = get_logger(__name__)
 class SearchTerms(BaseModel):
     """Search terms generated from natural language queries."""
 
-    terms: List[str]
+    terms: list[str]
 
 
 class QueryAgent:
@@ -89,7 +88,7 @@ class QueryAgent:
         self.embedding_service = Embedder(config)
         logger.info(f"initialized query agent with model {config.llm_model}")
 
-    def _generate_search_terms(self, question: str) -> List[str]:
+    def _generate_search_terms(self, question: str) -> list[str]:
         """Generate search terms from natural language question."""
         try:
             logger.info(f"generating search terms for question: {question[:100]}...")
@@ -169,7 +168,7 @@ class QueryAgent:
             logger.error(f"failed to process query: {e}")
             return f"Sorry, I encountered an error while processing your question: {str(e)}"
 
-    def _build_context(self, documents: List[Document]) -> str:
+    def _build_context(self, documents: list[Document]) -> str:
         """Build context string from documents."""
         context_parts = []
         for i, doc in enumerate(documents, 1):

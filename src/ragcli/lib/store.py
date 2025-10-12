@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List, Dict, Any, Optional
+from typing import Any
 from dataclasses import dataclass
 
 from qdrant_client import QdrantClient
@@ -16,20 +16,20 @@ class Document:
     """Document data structure."""
 
     text: str
-    metadata: Dict[str, Any]
-    id: Optional[str] = None
+    metadata: dict[str, Any]
+    id: str | None = None
 
 
 class VectorStore(ABC):
     """Abstract base class for vector stores."""
 
     @abstractmethod
-    def add_documents(self, documents: List[Document]) -> List[str]:
+    def add_documents(self, documents: list[Document]) -> list[str]:
         """Add documents to the vector store."""
         pass
 
     @abstractmethod
-    def search(self, query_vector: List[float], limit: int = 5) -> List[Document]:
+    def search(self, query_vector: list[float], limit: int = 5) -> list[Document]:
         """Search for similar documents."""
         pass
 
@@ -77,7 +77,7 @@ class QdrantStore(VectorStore):
             logger.error(f"failed to check collection existence: {e}")
             return False
 
-    def add_documents(self, documents: List[Document]) -> List[str]:
+    def add_documents(self, documents: list[Document]) -> list[str]:
         """Add documents to Qdrant."""
         if not documents:
             return []
@@ -110,7 +110,7 @@ class QdrantStore(VectorStore):
             logger.error(f"failed to add documents: {e}")
             raise
 
-    def upsert_with_vectors(self, documents: List[Document], vectors: List[List[float]]) -> List[str]:
+    def upsert_with_vectors(self, documents: list[Document], vectors: list[list[float]]) -> list[str]:
         """Upsert documents with their vectors to Qdrant."""
         if len(documents) != len(vectors):
             raise ValueError("number of documents and vectors must match")
@@ -137,7 +137,7 @@ class QdrantStore(VectorStore):
             logger.error(f"failed to upsert documents: {e}")
             raise
 
-    def search(self, query_vector: List[float], limit: int = 5) -> List[Document]:
+    def search(self, query_vector: list[float], limit: int = 5) -> list[Document]:
         """Search for similar documents in Qdrant."""
         try:
             search_result = self.client.search(

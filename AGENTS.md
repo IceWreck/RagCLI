@@ -58,6 +58,7 @@ src/ragcli/
 ## Code Conventions
 
 - Write modular, clean and fully typed modern python code.
+- Use new style Python types (e.g., `list`, `dict`, `tuple`, `set`, `int | None` instead of `List`, `Dict`, `Tuple`, `Set`, `Optional`).
 - Use lower case for logs: logger.info("starting xyz").
 - Prefer logger instead of print statements.
 - Log lines and exceptions should always start with a lowercase char.

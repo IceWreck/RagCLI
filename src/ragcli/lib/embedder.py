@@ -1,4 +1,3 @@
-from typing import List
 import openai
 
 from .config import Config
@@ -20,7 +19,7 @@ class Embedder:
         self.model = config.embedding_model
         logger.info(f"initialized embedding service with model {self.model}")
 
-    def embed_text(self, text: str) -> List[float]:
+    def embed_text(self, text: str) -> list[float]:
         """Generate embedding for a single text."""
         try:
             response = self.client.embeddings.create(
@@ -38,7 +37,7 @@ class Embedder:
             logger.error(f"failed to generate embedding: {e}")
             raise
 
-    def embed_texts(self, texts: List[str]) -> List[List[float]]:
+    def embed_texts(self, texts: list[str]) -> list[list[float]]:
         """Generate embeddings for multiple texts in batch."""
         if not texts:
             return []
@@ -66,7 +65,7 @@ class Embedder:
             logger.error(f"failed to generate embeddings: {e}")
             raise
 
-    def embed_chunks(self, chunks: List[Chunk]) -> List[tuple[Chunk, List[float]]]:
+    def embed_chunks(self, chunks: list[Chunk]) -> list[tuple[Chunk, list[float]]]:
         """Generate embeddings for text chunks."""
         texts = [chunk.text for chunk in chunks]
         embeddings = self.embed_texts(texts)
