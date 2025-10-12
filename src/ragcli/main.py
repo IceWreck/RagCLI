@@ -65,7 +65,7 @@ def insert(
             vectors.append(embedding)
 
         # Store in vector database
-        vector_store.upsert_with_vectors(documents, vectors)
+        vector_store.insert_documents_with_vectors(documents, vectors)
 
         logger.info(f"successfully inserted {len(documents)} documents into collection '{collection}'")
         typer.echo(f"✅ Successfully inserted {len(documents)} documents")

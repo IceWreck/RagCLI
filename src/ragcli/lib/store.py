@@ -24,7 +24,7 @@ class VectorStore(ABC):
     """Abstract base class for vector stores."""
 
     @abstractmethod
-    def upsert_with_vectors(self, documents: list[Document], vectors: list[list[float]]) -> list[str]:
+    def insert_documents_with_vectors(self, documents: list[Document], vectors: list[list[float]]) -> list[str]:
         """Add documents with their vectors to the vector store."""
         pass
 
@@ -34,13 +34,19 @@ class VectorStore(ABC):
         pass
 
     @abstractmethod
-    def create_collection(self, collection_name: str, vector_size: int) -> None:
+    def create_collection(self, vector_size: int) -> None:
         """Create a new collection."""
         pass
 
+    @property
     @abstractmethod
-    def collection_exists(self, collection_name: str) -> bool:
+    def collection_exists(self) -> bool:
         """Check if collection exists."""
+        pass
+
+    @abstractmethod
+    def delete_collection(self) -> None:
+        """Delete a collection."""
         pass
 
 
@@ -56,28 +62,29 @@ class QdrantStore(VectorStore):
         )
         logger.info(f"initialized qdrant client at {config.qdrant_host}:{config.qdrant_port}")
 
-    def create_collection(self, collection_name: str, vector_size: int) -> None:
+    def create_collection(self, vector_size: int) -> None:
         """Create a new collection in Qdrant."""
         try:
             self.client.create_collection(
-                collection_name=collection_name,
+                collection_name=self.collection_name,
                 vectors_config=VectorParams(size=vector_size, distance=Distance.COSINE),
             )
-            logger.info(f"created collection {collection_name}")
+            logger.info(f"created collection {self.collection_name}")
         except Exception as e:
-            logger.error(f"failed to create collection {collection_name}: {e}")
+            logger.error(f"failed to create collection {self.collection_name}: {e}")
             raise
 
-    def collection_exists(self, collection_name: str) -> bool:
+    @property
+    def collection_exists(self) -> bool:
         """Check if collection exists in Qdrant."""
         try:
             collections = self.client.get_collections().collections
-            return any(c.name == collection_name for c in collections)
+            return any(c.name == self.collection_name for c in collections)
         except Exception as e:
             logger.error(f"failed to check collection existence: {e}")
             return False
 
-    def upsert_with_vectors(self, documents: list[Document], vectors: list[list[float]]) -> list[str]:
+    def insert_documents_with_vectors(self, documents: list[Document], vectors: list[list[float]]) -> list[str]:
         """Upsert documents with their vectors to Qdrant."""
         if len(documents) != len(vectors):
             raise ValueError("number of documents and vectors must match")
@@ -95,8 +102,8 @@ class QdrantStore(VectorStore):
         if any(len(v) != vector_size for v in vectors):
             raise ValueError("all vectors must have the same dimension")
 
-        if not self.collection_exists(self.collection_name):
-            self.create_collection(self.collection_name, vector_size)
+        if not self.collection_exists:
+            self.create_collection(vector_size)
 
         points = []
         for i, (doc, vector) in enumerate(zip(documents, vectors)):
@@ -150,7 +157,7 @@ class QdrantStore(VectorStore):
             raise
 
     def delete_collection(self) -> None:
-        """Delete the collection."""
+        """Delete a collection."""
         try:
             self.client.delete_collection(self.collection_name)
             logger.info(f"deleted collection {self.collection_name}")
