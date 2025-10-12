@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict, Any
 from pathlib import Path
 from dataclasses import dataclass
 
@@ -13,7 +13,7 @@ class Chunk:
     """Text chunk data structure."""
 
     text: str
-    metadata: dict
+    metadata: Dict[str, Any]
     source: str
     chunk_index: int
 

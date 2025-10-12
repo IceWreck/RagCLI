@@ -35,7 +35,7 @@ def insert(
 
         # Initialize components
         chunker = TextChunker(config)
-        embedding_service = Embedder(config)
+        embedder = Embedder(config)
         vector_store = QdrantStore(config, collection)
 
         # Process files
@@ -47,11 +47,11 @@ def insert(
         logger.info(f"created {len(chunks)} chunks")
 
         # Generate embeddings
-        embedded_chunks = embedding_service.embed_chunks(chunks)
+        embedded_chunks = embedder.embed_chunks(chunks)
 
         # Convert to Document objects
-        documents = []
-        vectors = []
+        documents: List[Document] = []
+        vectors: List[List[float]] = []
         for chunk, embedding in embedded_chunks:
             doc = Document(
                 text=chunk.text,
