@@ -6,7 +6,7 @@ from typing import List, Optional
 from .lib.config import Config, DEFAULT_VECTOR_COLLECTION
 from .lib.store import QdrantStore, Document
 from .lib.chunker import TextChunker
-from .lib.embeddings import EmbeddingService
+from .lib.embedder import Embedder
 from .lib.agent import QueryAgent
 from .lib.log import get_logger
 
@@ -35,7 +35,7 @@ def insert(
 
         # Initialize components
         chunker = TextChunker(config)
-        embedding_service = EmbeddingService(config)
+        embedding_service = Embedder(config)
         vector_store = QdrantStore(config, collection)
 
         # Process files

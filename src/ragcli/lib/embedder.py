@@ -8,7 +8,7 @@ from .log import get_logger
 logger = get_logger(__name__)
 
 
-class EmbeddingService:
+class Embedder:
     """Service for generating text embeddings using OpenAI."""
 
     def __init__(self, config: Config):

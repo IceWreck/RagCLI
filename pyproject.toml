@@ -15,7 +15,7 @@ dependencies = [
 ]
 
 [project.scripts]
-ragexperiments = "ragcli.main:main"
+ragcli = "ragcli.main:main"
 
 [build-system]
 requires = ["hatchling"]

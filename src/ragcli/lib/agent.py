@@ -7,7 +7,7 @@ from pydantic_ai.providers.openai import OpenAIProvider
 
 from .config import Config
 from .store import VectorStore, Document
-from .embeddings import EmbeddingService
+from .embedder import Embedder
 from .log import get_logger
 
 logger = get_logger(__name__)
@@ -86,7 +86,7 @@ class QueryAgent:
             """),
         )
 
-        self.embedding_service = EmbeddingService(config)
+        self.embedding_service = Embedder(config)
         logger.info(f"initialized query agent with model {config.llm_model}")
 
     def _generate_search_terms(self, question: str) -> List[str]:
