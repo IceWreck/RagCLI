@@ -105,7 +105,7 @@ class QdrantStore(VectorStore):
         if not self.collection_exists:
             self.create_collection(vector_size)
 
-        points = []
+        points: list[PointStruct] = []
         for i, (doc, vector) in enumerate(zip(documents, vectors)):
             point_id = doc.id or str(i)
             points.append(
@@ -133,7 +133,7 @@ class QdrantStore(VectorStore):
                 limit=limit,
             )
 
-            documents = []
+            documents: list[Document] = []
             for hit in search_result:
                 if hit.payload is None:
                     logger.warning(f"hit {hit.id} has no payload, skipping")

@@ -45,7 +45,7 @@ class Embedder:
         try:
             # Process in batches to avoid rate limits
             batch_size = 100
-            all_embeddings = []
+            all_embeddings: list[list[float]] = []
 
             for i in range(0, len(texts), batch_size):
                 batch = texts[i : i + batch_size]
@@ -70,7 +70,7 @@ class Embedder:
         texts = [chunk.text for chunk in chunks]
         embeddings = self.embed_texts(texts)
 
-        result = []
+        result: list[tuple[Chunk, list[float]]] = []
         for chunk, embedding in zip(chunks, embeddings):
             result.append((chunk, embedding))
 

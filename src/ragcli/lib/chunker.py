@@ -53,7 +53,7 @@ class TextChunker:
             logger.info(f"text length {len(text)} is within chunk size, creating single chunk")
             return [Chunk(text=text, metadata={"length": len(text)}, source=source, chunk_index=0)]
 
-        chunks = []
+        chunks: list[Chunk] = []
         start = 0
         chunk_index = 0
 
@@ -109,7 +109,7 @@ class TextChunker:
 
     def chunk_files(self, file_paths: list[Path]) -> list[Chunk]:
         """Chunk multiple files."""
-        all_chunks = []
+        all_chunks: list[Chunk] = []
         for file_path in file_paths:
             try:
                 chunks = self.chunk_file(file_path)

@@ -61,19 +61,20 @@ class JinaReranker(BaseReranker):
                 logger.warning("no results in reranker response")
                 return documents[:limit]
 
-            reranked_docs = []
+            reranked_docs: list[Document] = []
             for item in result["results"]:
-                if "index" in item and item["index"] < len(documents):
-                    doc = documents[item["index"]]
-                    reranked_docs.append(doc)
+                index = item.get("index")
+                if isinstance(index, int) and 0 <= index < len(documents):
+                    selected_doc = documents[index]
+                    reranked_docs.append(selected_doc)
 
             # Fill in remaining docs if fewer results than requested
             if len(reranked_docs) < limit and len(documents) > len(reranked_docs):
-                seen_ids = {doc.id for doc in reranked_docs if doc.id}
+                seen_ids: set[str] = {doc.id for doc in reranked_docs if doc.id is not None}
                 for doc in documents:
                     if len(reranked_docs) >= limit:
                         break
-                    if doc.id not in seen_ids:
+                    if doc.id is not None and doc.id not in seen_ids:
                         reranked_docs.append(doc)
                         seen_ids.add(doc.id)
 

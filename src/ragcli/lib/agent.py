@@ -114,7 +114,7 @@ class QueryAgent:
             logger.info(f"searching with {len(search_terms)} queries")
 
             # Generate embeddings for all search queries
-            all_embeddings = []
+            all_embeddings: list[list[float]] = []
             for query in search_terms:
                 embedding = self.embedding_service.embed_text(query)
                 all_embeddings.append(embedding)
@@ -128,7 +128,7 @@ class QueryAgent:
 
             # Remove duplicates while preserving order
             seen_ids: set[str] = set()
-            relevant_docs = []
+            relevant_docs: list[Document] = []
             for doc in all_docs:
                 if doc.id and doc.id not in seen_ids:
                     seen_ids.add(doc.id)
@@ -175,7 +175,7 @@ class QueryAgent:
 
     def _build_context(self, documents: list[Document]) -> str:
         """Build context string from documents."""
-        context_parts = []
+        context_parts: list[str] = []
         for i, doc in enumerate(documents, 1):
             metadata_str = ", ".join(f"{k}: {v}" for k, v in doc.metadata.items())
             context_parts.append(
