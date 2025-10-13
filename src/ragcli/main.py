@@ -93,7 +93,7 @@ def query(
         agent = QueryAgent(config, vector_store)
 
         # Check if collection exists
-        if not vector_store.collection_exists(collection):
+        if not vector_store.collection_exists:
             logger.error(f"collection '{collection}' does not exist")
             typer.echo(f"❌ Collection '{collection}' does not exist. Run 'insert' command first.")
             raise typer.Exit(1)
@@ -122,9 +122,10 @@ def status(
         typer.echo(f"Qdrant: {config.qdrant_host}:{config.qdrant_port}")
         typer.echo(f"LLM Model: {config.llm_model}")
         typer.echo(f"Embedding Model: {config.embedding_model}")
+        typer.echo(f"Reranker Model: {config.reranker_model}")
         typer.echo(f"OpenAI Endpoint: {config.openai_base_url}")
 
-        if vector_store.collection_exists(collection):
+        if vector_store.collection_exists:
             typer.echo(f"✅ Collection '{collection}' exists")
         else:
             typer.echo(f"❌ Collection '{collection}' does not exist")

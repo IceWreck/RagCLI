@@ -7,6 +7,7 @@ from pydantic_ai.providers.openai import OpenAIProvider
 from .config import Config
 from .store import VectorStore, Document
 from .embedder import Embedder
+from .reranker import JinaReranker
 from .log import get_logger
 
 logger = get_logger(__name__)
@@ -86,6 +87,7 @@ class QueryAgent:
         )
 
         self.embedding_service = Embedder(config)
+        self.reranker = JinaReranker(config)
         logger.info(f"initialized query agent with model {config.llm_model}")
 
     def _generate_search_terms(self, question: str) -> list[str]:
@@ -132,8 +134,11 @@ class QueryAgent:
                     seen_ids.add(doc.id)
                     relevant_docs.append(doc)
 
-            # Limit to requested number of documents
-            # relevant_docs = relevant_docs[:limit]
+            # Rerank documents using original query
+            if relevant_docs:
+                logger.info(f"reranking {len(relevant_docs)} documents")
+                relevant_docs = self.reranker.rerank(question, relevant_docs, limit)
+                logger.info(f"reranked to {len(relevant_docs)} documents")
 
             if not relevant_docs:
                 logger.warning("no relevant documents found")
