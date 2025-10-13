@@ -25,11 +25,15 @@ build-backend = "hatchling.build"
 line-length = 120
 indent-width = 4
 
+[tool.mypy]
+strict = true
+
 [tool.pyright]
-typeCheckingMode = "standard"
+typeCheckingMode = "strict"
 
 [dependency-groups]
 dev = [
+    "basedpyright>=1.31.7",
     "mypy>=1.18.2",
     "pytest>=8.4.2",
     "ruff>=0.14.0",

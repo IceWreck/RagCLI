@@ -93,8 +93,10 @@ src/ragcli/
 make lint
 ```
 
+## Typechecking
+
 ```
-make mypy
+make typecheck
 ```
 
 ## Formatting

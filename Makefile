@@ -19,8 +19,9 @@ lint:
 	uv run ruff check --fix src/
 	uv run ruff check
 
-mypy:
-	uv run mypy ./src
+typecheck:
+# 	uv run mypy ./src
+	uv run basedpyright ./src
 
 qdrant-start:
 	podman run -d --name qdrant -p 6333:6333 -p 6334:6334 qdrant/qdrant:latest
