@@ -22,7 +22,7 @@ class JinaReranker(BaseReranker):
 
     def __init__(self, config: Config):
         self.config = config
-        self.base_url = config.openai_base_url.rstrip('/')
+        self.base_url = config.openai_base_url.rstrip("/")
         self.model = config.reranker_model
         self.client = httpx.Client(timeout=30.0)
         logger.info(f"initialized jina reranker with model {self.model} at {self.base_url}")
@@ -96,5 +96,5 @@ class JinaReranker(BaseReranker):
 
     def __del__(self) -> None:
         """Cleanup HTTP client."""
-        if hasattr(self, 'client'):
+        if hasattr(self, "client"):
             self.client.close()

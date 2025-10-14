@@ -20,6 +20,8 @@ class Config:
     chunk_size: int = 1000
     chunk_overlap: int = 200
     vector_collection: str = DEFAULT_VECTOR_COLLECTION
+    search_limit: int = 20
+    rerank_limit: int = 5
 
     @classmethod
     def from_env(cls) -> "Config":
@@ -38,4 +40,6 @@ class Config:
             chunk_size=int(os.getenv("CHUNK_SIZE", str(cls.chunk_size))),
             chunk_overlap=int(os.getenv("CHUNK_OVERLAP", str(cls.chunk_overlap))),
             vector_collection=os.getenv("VECTOR_COLLECTION", cls.vector_collection),
+            search_limit=int(os.getenv("SEARCH_LIMIT", str(cls.search_limit))),
+            rerank_limit=int(os.getenv("RERANK_LIMIT", str(cls.rerank_limit))),
         )

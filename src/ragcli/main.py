@@ -15,10 +15,10 @@ app = typer.Typer(help="RAG CLI - Insert and query documents using vector search
 
 @app.command()
 def insert(
-    files: list[Path] = typer.Argument(..., help="List of files to ingest"),
-    collection: str = typer.Option(DEFAULT_VECTOR_COLLECTION, "--collection", "-c", help="Collection name"),
-    chunk_size: int | None = typer.Option(None, "--chunk-size", help="Chunk size in characters"),
-    chunk_overlap: int | None = typer.Option(None, "--chunk-overlap", help="Chunk overlap in characters"),
+    files: list[Path] = typer.Argument(..., help="List of files to ingest."),
+    collection: str = typer.Option(DEFAULT_VECTOR_COLLECTION, "--collection", "-c", help="Collection name."),
+    chunk_size: int | None = typer.Option(None, "--chunk-size", help="Chunk size in characters."),
+    chunk_overlap: int | None = typer.Option(None, "--chunk-overlap", help="Chunk overlap in characters."),
 ) -> None:
     """Insert documents into the vector store."""
     try:
@@ -78,9 +78,10 @@ def insert(
 
 @app.command()
 def query(
-    question: str = typer.Argument(..., help="Question to ask"),
-    collection: str = typer.Option(DEFAULT_VECTOR_COLLECTION, "--collection", "-c", help="Collection name"),
-    limit: int = typer.Option(5, "--limit", "-l", help="Number of documents to retrieve"),
+    question: str = typer.Argument(..., help="Question to ask."),
+    collection: str = typer.Option(DEFAULT_VECTOR_COLLECTION, "--collection", "-c", help="Collection name."),
+    search_limit: int = typer.Option(20, "--search-limit", help="Number of documents to fetch from vector search."),
+    rerank_limit: int = typer.Option(5, "--rerank-limit", help="Number of documents to return after reranking."),
 ) -> None:
     """Ask a question using RAG."""
     try:
@@ -99,7 +100,7 @@ def query(
             raise typer.Exit(1)
 
         # Process query
-        response = agent.query(question, limit)
+        response = agent.query(question, search_limit=search_limit, rerank_limit=rerank_limit)
 
         typer.echo(f"\n🤖 Answer:\n{response}")
 

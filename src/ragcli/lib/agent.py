@@ -106,9 +106,15 @@ class QueryAgent:
             # Fallback to using the question as single search term
             return [question]
 
-    def query(self, question: str, limit: int = 5) -> str:
+    def query(self, question: str, search_limit: int | None = None, rerank_limit: int | None = None) -> str:
         """Answer a question using RAG."""
         try:
+            # Use provided limits or config defaults
+            search_limit = search_limit or self.config.search_limit
+            rerank_limit = rerank_limit or self.config.rerank_limit
+
+            logger.info(f"using search_limit={search_limit}, rerank_limit={rerank_limit}")
+
             # Generate search terms from the natural language question
             search_terms = self._generate_search_terms(question)
             logger.info(f"searching with {len(search_terms)} queries")
@@ -123,7 +129,7 @@ class QueryAgent:
             # Search for relevant documents using all embeddings
             all_docs: list[Document] = []
             for embedding in all_embeddings:
-                docs = self.vector_store.search(embedding, limit=limit)
+                docs = self.vector_store.search(embedding, limit=search_limit)
                 all_docs.extend(docs)
 
             # Remove duplicates while preserving order
@@ -137,7 +143,7 @@ class QueryAgent:
             # Rerank documents using original query
             if relevant_docs:
                 logger.info(f"reranking {len(relevant_docs)} documents")
-                relevant_docs = self.reranker.rerank(question, relevant_docs, limit)
+                relevant_docs = self.reranker.rerank(question, relevant_docs, rerank_limit)
                 logger.info(f"reranked to {len(relevant_docs)} documents")
 
             if not relevant_docs:
