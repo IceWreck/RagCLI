@@ -10,7 +10,8 @@ The RAG CLI system enables users to:
 - **Chunk documents** intelligently with configurable overlap
 - **Generate embeddings** using OpenAI-compatible models
 - **Store and search** vectors using Qdrant
-- **Query documents** using LLM-powered question answering
+- **Query documents** using LLM-powered question answering with search term generation
+- **Rerank results** using advanced reranking models for improved relevance
 
 The system is designed as a modular library with clean separation of concerns, making it easy to extend and customize components.
 
@@ -22,12 +23,14 @@ The system is designed as a modular library with clean separation of concerns, m
 src/ragcli/
 ├── main.py              # CLI interface using Typer
 ├── lib/
-│   ├── config.py        # Configuration management with environment variables
-│   ├── store.py         # Vector store abstraction and Qdrant implementation
+│   ├── __init__.py      # Package initialization
+│   ├── agent.py         # Pydantic AI query agent with search term generation
 │   ├── chunker.py       # Text chunking with overlap handling
-│   ├── embeddings.py    # OpenAI embedding service
-│   ├── agent.py         # Pydantic AI query agent
-│   └── log.py           # Logging utilities
+│   ├── config.py        # Configuration management with environment variables
+│   ├── embedder.py      # OpenAI embedding service
+│   ├── log.py           # Logging utilities
+│   ├── reranker.py      # Document reranking service (Jina API)
+│   └── store.py         # Vector store abstraction and Qdrant implementation
 ```
 
 ### Data Flow
@@ -41,10 +44,19 @@ src/ragcli/
 
 **Query Pipeline:**
 
-1. **Question Embedding** → Convert query to vector
-2. **Vector Search** → Find similar document chunks
-3. **Context Building** → Assemble relevant chunks as context
-4. **LLM Generation** → Generate answer using Pydantic AI
+1. **Search Term Generation** → Convert natural language to optimized search queries using LLM
+2. **Multi-Query Strategy** → Run multiple semantic searches for better coverage
+3. **Document Deduplication** → Remove duplicate results while preserving order
+4. **Reranking** → Reorder results using advanced reranking models (Jina)
+5. **Context Building** → Assemble relevant chunks as context
+6. **LLM Generation** → Generate answer using Pydantic AI
+
+### CLI Commands
+
+- **`insert`**: Ingest documents into the vector database
+- **`query`**: Query documents with natural language questions
+- **`status`**: Check system status and configuration
+- **`delete_collection`**: Remove entire collections from the database
 
 ### Technology Stack
 
@@ -52,8 +64,11 @@ src/ragcli/
 - **Vector Database**: Qdrant for similarity search
 - **LLM Integration**: Pydantic AI with OpenAI-compatible endpoints
 - **Embeddings**: OpenAI library with configurable models
+- **Reranking**: Jina API for document reranking (bge-reranker-v2-m3)
+- **HTTP Client**: httpx for API requests with timeout handling
 - **Containerization**: Podman for Qdrant deployment (read Makefile)
 - **Dependency Management**: UV for Python packages
+- **Python Version**: Requires Python 3.12+
 
 ## Code Conventions
 
@@ -87,31 +102,31 @@ src/ragcli/
   - Trust Python's built-in error handling.
 - Let stack traces expose issues during development.
 
-## Linting
+## Development
 
-```
-make lint
-```
+### Typechecking
 
-## Typechecking
-
-```
+```bash
 make typecheck
 ```
 
-## Formatting
+### Linting
 
+```bash
+make lint
 ```
+
+### Formatting
+
+```bash
 make format
 ```
 
-## Dependency Management
+### Dependency Management
 
 We use uv to manage Python dependencies.
 
-Run
-
-```
+```bash
 uv add <your-package-name>
 ```
 

@@ -30,5 +30,9 @@ qdrant-stop:
 	podman stop qdrant
 	podman rm qdrant
 
+qdrant-remove:
+	podman stop qdrant
+	podman rm qdrant
+
 qdrant-logs:
 	podman logs -f qdrant
