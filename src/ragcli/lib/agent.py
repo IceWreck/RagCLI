@@ -140,11 +140,13 @@ class QueryAgent:
                     seen_ids.add(doc.id)
                     relevant_docs.append(doc)
 
-            # Rerank documents using original query
-            if relevant_docs:
+            # Rerank documents using original query if rerank_limit > 0
+            if relevant_docs and rerank_limit > 0:
                 logger.info(f"reranking {len(relevant_docs)} documents")
                 relevant_docs = self.reranker.rerank(question, relevant_docs, rerank_limit)
                 logger.info(f"reranked to {len(relevant_docs)} documents")
+            elif relevant_docs:
+                logger.info(f"skipping reranking due to rerank_limit={rerank_limit}")
 
             if not relevant_docs:
                 logger.warning("no relevant documents found")

@@ -10,7 +10,7 @@ DEFAULT_VECTOR_COLLECTION = "ragcli-default-collection"
 class Config:
     """Configuration class for RAG CLI system."""
 
-    openai_base_url: str = "http://calyrex-neb.abifog.com:7884/v1/"
+    openai_base_url: str = "http://localhost:7884/v1/"
     openai_api_key: str | None = None
     llm_model: str = "gpt-oss-20b"
     embedding_model: str = "nomic-embed-text"
