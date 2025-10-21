@@ -93,7 +93,7 @@ class QueryAgent:
     def _generate_search_terms(self, question: str) -> list[str]:
         """Generate search terms from natural language question."""
         try:
-            logger.info(f"generating search terms for question: {question[:100]}...")
+            logger.info(f"generating search terms for question: {question}...")
 
             result = self.search_agent.run_sync(question)
             search_terms = result.output.terms
@@ -110,13 +110,16 @@ class QueryAgent:
         """Answer a question using RAG."""
         try:
             # Use provided limits or config defaults
-            search_limit = search_limit or self.config.search_limit
-            rerank_limit = rerank_limit or self.config.rerank_limit
+            search_limit = search_limit if search_limit is not None else self.config.search_limit
+            rerank_limit = rerank_limit if rerank_limit is not None else self.config.rerank_limit
 
             logger.info(f"using search_limit={search_limit}, rerank_limit={rerank_limit}")
 
             # Generate search terms from the natural language question
-            search_terms = self._generate_search_terms(question)
+
+            # search_terms = self._generate_search_terms(question)
+            search_terms = [question]  # tmp disable search agent, pass query directly to vector db
+
             logger.info(f"searching with {len(search_terms)} queries")
 
             # Generate embeddings for all search queries
@@ -141,7 +144,7 @@ class QueryAgent:
                     relevant_docs.append(doc)
 
             # Rerank documents using original query if rerank_limit > 0
-            if relevant_docs and rerank_limit > 0:
+            if relevant_docs and rerank_limit and rerank_limit > 0:
                 logger.info(f"reranking {len(relevant_docs)} documents")
                 relevant_docs = self.reranker.rerank(question, relevant_docs, rerank_limit)
                 logger.info(f"reranked to {len(relevant_docs)} documents")

@@ -35,7 +35,7 @@ class JinaReranker(BaseReranker):
 
         try:
             # Prepare API request
-            endpoint = f"{self.base_url}/v1/rerank"
+            endpoint = f"{self.base_url}/rerank"
             texts = [doc.text for doc in documents]
 
             payload = {
@@ -51,10 +51,11 @@ class JinaReranker(BaseReranker):
 
             # Make API request
             response = self.client.post(endpoint, json=payload)
+            logger.debug(f"reranker response: {response.text}")
+
             response.raise_for_status()
 
             result = response.json()
-            logger.debug(f"reranker response: {result}")
 
             # Parse reranking results
             if "results" not in result:
