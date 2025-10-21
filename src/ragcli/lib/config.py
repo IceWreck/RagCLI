@@ -12,7 +12,7 @@ class Config:
 
     openai_base_url: str = "http://localhost:7884/v1/"
     openai_api_key: str | None = None
-    llm_model: str = "gpt-oss-20b"
+    llm_model: str = "qwen3-4b"
     embedding_model: str = "nomic-embed-text"
     reranker_model: str = "bge-reranker-v2-m3"
     qdrant_host: str = "127.0.0.1"
@@ -20,8 +20,8 @@ class Config:
     chunk_size: int = 1000
     chunk_overlap: int = 200
     vector_collection: str = DEFAULT_VECTOR_COLLECTION
-    search_limit: int = 20
-    rerank_limit: int = 5
+    search_limit: int = 50
+    rerank_limit: int = 20
 
     @classmethod
     def from_env(cls) -> "Config":

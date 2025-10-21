@@ -80,8 +80,8 @@ def insert(
 def query(
     question: str = typer.Argument(..., help="Question to ask."),
     collection: str = typer.Option(DEFAULT_VECTOR_COLLECTION, "--collection", "-c", help="Collection name."),
-    search_limit: int = typer.Option(20, "--search-limit", help="Number of documents to fetch from vector search."),
-    rerank_limit: int = typer.Option(5, "--rerank-limit", help="Number of documents to return after reranking."),
+    search_limit: int = typer.Option(50, "--search-limit", help="Number of documents to fetch from vector search."),
+    rerank_limit: int = typer.Option(20, "--rerank-limit", help="Number of documents to return after reranking."),
     filter: list[str] = typer.Option([], "--filter", help="Filter results by metadata (key=value). Can be used multiple times."),
 ) -> None:
     """Ask a question using RAG."""
