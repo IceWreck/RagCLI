@@ -3,7 +3,7 @@ from typing import Any
 from dataclasses import dataclass
 
 from qdrant_client import QdrantClient
-from qdrant_client.models import Distance, VectorParams, PointStruct
+from qdrant_client.models import Distance, VectorParams, PointStruct, Filter, FieldCondition, MatchValue, Condition
 
 from .config import Config
 from .log import get_logger
@@ -29,7 +29,7 @@ class VectorStore(ABC):
         pass
 
     @abstractmethod
-    def search(self, query_vector: list[float], limit: int = 5) -> list[Document]:
+    def search(self, query_vector: list[float], limit: int = 5, metadata_filter: dict[str, str] | None = None) -> list[Document]:
         """Search for similar documents."""
         pass
 
@@ -124,13 +124,27 @@ class QdrantStore(VectorStore):
             logger.error(f"failed to upsert documents: {e}")
             raise
 
-    def search(self, query_vector: list[float], limit: int = 5) -> list[Document]:
+    def search(self, query_vector: list[float], limit: int = 5, metadata_filter: dict[str, str] | None = None) -> list[Document]:
         """Search for similar documents in Qdrant."""
         try:
+            # Build filter if metadata_filter is provided
+            filter_obj = None
+            if metadata_filter:
+                conditions: list[Condition] = []
+                for key, value in metadata_filter.items():
+                    condition = FieldCondition(
+                        key=key,
+                        match=MatchValue(value=value),
+                    )
+                    conditions.append(condition)
+                filter_obj = Filter(must=conditions)
+                logger.info(f"applying metadata filter: {metadata_filter}")
+
             search_result = self.client.search(
                 collection_name=self.collection_name,
                 query_vector=query_vector,
                 limit=limit,
+                query_filter=filter_obj,
             )
 
             documents: list[Document] = []

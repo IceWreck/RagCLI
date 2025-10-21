@@ -106,7 +106,7 @@ class QueryAgent:
             # Fallback to using the question as single search term
             return [question]
 
-    def query(self, question: str, search_limit: int | None = None, rerank_limit: int | None = None) -> str:
+    def query(self, question: str, search_limit: int | None = None, rerank_limit: int | None = None, metadata_filter: dict[str, str] | None = None) -> str:
         """Answer a question using RAG."""
         try:
             # Use provided limits or config defaults
@@ -132,7 +132,7 @@ class QueryAgent:
             # Search for relevant documents using all embeddings
             all_docs: list[Document] = []
             for embedding in all_embeddings:
-                docs = self.vector_store.search(embedding, limit=search_limit)
+                docs = self.vector_store.search(embedding, limit=search_limit, metadata_filter=metadata_filter)
                 all_docs.extend(docs)
 
             # Remove duplicates while preserving order

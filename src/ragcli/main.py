@@ -82,12 +82,25 @@ def query(
     collection: str = typer.Option(DEFAULT_VECTOR_COLLECTION, "--collection", "-c", help="Collection name."),
     search_limit: int = typer.Option(20, "--search-limit", help="Number of documents to fetch from vector search."),
     rerank_limit: int = typer.Option(5, "--rerank-limit", help="Number of documents to return after reranking."),
+    filter: list[str] = typer.Option([], "--filter", help="Filter results by metadata (key=value). Can be used multiple times."),
 ) -> None:
     """Ask a question using RAG."""
     try:
         config = Config.from_env()
 
         logger.info(f"processing query: {question[:100]}...")
+
+        # Parse filters
+        metadata_filter: dict[str, str] | None = None
+        if filter:
+            metadata_filter = {}
+            for f in filter:
+                if "=" not in f:
+                    typer.echo(f"❌ Invalid filter format: {f}. Use key=value format.")
+                    raise typer.Exit(1)
+                key, value = f.split("=", 1)
+                metadata_filter[key] = value
+            logger.info(f"applying metadata filters: {metadata_filter}")
 
         # Initialize components
         vector_store = QdrantStore(config, collection)
@@ -100,7 +113,7 @@ def query(
             raise typer.Exit(1)
 
         # Process query
-        response = agent.query(question, search_limit=search_limit, rerank_limit=rerank_limit)
+        response = agent.query(question, search_limit=search_limit, rerank_limit=rerank_limit, metadata_filter=metadata_filter)
 
         typer.echo(f"\n🤖 Answer:\n{response}")
 
