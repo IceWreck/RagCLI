@@ -15,6 +15,7 @@ class Config:
     llm_model: str = "qwen3-4b"
     embedding_model: str = "nomic-embed-text"
     reranker_model: str = "bge-reranker-v2-m3"
+    reranker_base_url: str = "http://localhost:7884/v1/"
     qdrant_host: str = "127.0.0.1"
     qdrant_port: int = 6333
     chunk_size: int = 1000
@@ -35,6 +36,7 @@ class Config:
             llm_model=os.getenv("LLM_MODEL", cls.llm_model),
             embedding_model=os.getenv("EMBEDDING_MODEL", cls.embedding_model),
             reranker_model=os.getenv("RERANKER_MODEL", cls.reranker_model),
+            reranker_base_url=os.getenv("RERANKER_BASE_URL", cls.reranker_base_url),
             qdrant_host=os.getenv("QDRANT_HOST", cls.qdrant_host),
             qdrant_port=int(os.getenv("QDRANT_PORT", str(cls.qdrant_port))),
             chunk_size=int(os.getenv("CHUNK_SIZE", str(cls.chunk_size))),
